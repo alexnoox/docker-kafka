@@ -17,7 +17,8 @@ RUN apt-get update && \
     rm /tmp/kafka_"$SCALA_VERSION"-"$KAFKA_VERSION".tgz
 
 # Entrypoint
-ADD docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+ADD kafka-entrypoint.sh /usr/bin/kafka-entrypoint.sh
+ADD zookeeper-entrypoint.sh /usr/bin/zookeeper-entrypoint.sh
 
 # Supervisor config
 ADD supervisor/kafka.conf supervisor/zookeeper.conf /etc/supervisor/conf.d/

@@ -1,17 +1,17 @@
 #!/bin/sh
 
 # Optional ENV variables:
-# * ZK_MASTER: the zookeeper cluster master
+# * ZK_MASTER: the zookeeper cluster master, e.g. localhost:2181
+# * ZK_CHROOT: the zookeeper chroot to be created by zookeeper and used by Kafka (without / prefix), e.g. "kafka"
 # * KAFKA_HOST: the external ip for the container, e.g. `docker-machine ip \`docker-machine active\``
 # * KAFKA_PORT: the external port for Kafka, e.g. 9092
-# * ZK_CHROOT: the zookeeper chroot that's used by Kafka (without / prefix), e.g. "kafka"
 # * LOG_RETENTION_HOURS: the minimum age of a log file in hours to be eligible for deletion (default is 168, for 1 week)
 # * LOG_RETENTION_BYTES: configure the size at which segments are pruned from the log, (default is 1073741824, for 1GB)
 # * NUM_PARTITIONS: configure the default number of log partitions per topic
 
 # Get local internal docker ip
 MY_IP=`awk 'NR==1 {print $1}' /etc/hosts` 
-echo "### Starting .... Docker IP is $MY_IP"
+echo "### Starting Kafka..."
 
 # Set the kafka external host and port
 if [ ! -z "$KAFKA_HOST" ]; then
