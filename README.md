@@ -1,18 +1,33 @@
 # Maestrano Kafka
 Docker image for Apache Kafka
 
-## Build this docker image
+## Build and run this docker image
 
-* Build the image
+* Build it
 `docker build -t docker-kafka ./0.10`
 
-* Check that the image built
-`docker images`
+* Run the master container
+`docker run -p 2181:2181 -p 9092:9092 --env ZK_CHROOT=kafka --env SELF_HOST=localhost --env SELF_PORT=9092 docker-kafka`
 
-## Run a cluster
+* Run a slave container
+`docker run -p 2181:2181 -p 9092:9092 --env ZK_MASTER=ip:port/kafka --env SELF_HOST=localhost --env SELF_PORT=9092 docker-kafka`
 
-* Run the master image
-`docker run -p 2181:2181 -p 9092:9092 --env ZK_CHROOT=kafka --env KAFKA_HOST=localhost --env KAFKA_PORT=9092 docker-kafka`
+## Basic usage
 
-* Run a slave image
-`docker run -p 9093:9092 --env ZK_MASTER=localhost:2181/kafka --env ZK_CHROOT=mno --env KAFKA_HOST=localhost --env KAFKA_PORT=9092 docker-kafka`
+```
+export KAFKA=localhost:9092
+export ZOOKEEPER=localhost:2181/kafka
+
+# List kafka brokers
+zookeeper-shell $ZOOKEEPER <<< "ls /brokers/ids"
+
+# Manipulate topics
+kafka-topics --create --zookeeper $ZOOKEEPER -replication-factor 1 --partitions 1 --topic test
+kafka-topics --list --zookeeper $ZOOKEEPER
+kafka-topics --describe --zookeeper $ZOOKEEPER --topic test
+
+# Produce and consume events
+kafka-console-producer --broker-list $KAFKA --topic test
+kafka-console-consumer --bootstrap-server $KAFKA --topic test --from-beginning
+
+```

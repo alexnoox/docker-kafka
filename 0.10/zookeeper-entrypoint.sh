@@ -1,9 +1,8 @@
 #!/bin/sh
 
-# Get local internal docker ip
-MY_IP=`awk 'NR==1 {print $1}' /etc/hosts` 
 echo "### Starting Zookeeper..."
 
+echo "### Zookeeper config:"
 cat /etc/zookeeper/conf/zoo.cfg
 
 # Run Kafka

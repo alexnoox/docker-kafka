@@ -1,33 +1,32 @@
 #!/bin/sh
 
 # Optional ENV variables:
-# * ZK_MASTER: the zookeeper cluster master, e.g. localhost:2181
+# * ZK_MASTER: the zookeeper cluster master, e.g. localhost:2181/kafka
 # * ZK_CHROOT: the zookeeper chroot to be created by zookeeper and used by Kafka (without / prefix), e.g. "kafka"
-# * KAFKA_HOST: the external ip for the container, e.g. `docker-machine ip \`docker-machine active\``
-# * KAFKA_PORT: the external port for Kafka, e.g. 9092
+# * SELF_HOST: the external ip for the container, e.g. `docker-machine ip \`docker-machine active\``
+# * SELF_PORT: the external port for Kafka, e.g. 9092
 # * LOG_RETENTION_HOURS: the minimum age of a log file in hours to be eligible for deletion (default is 168, for 1 week)
 # * LOG_RETENTION_BYTES: configure the size at which segments are pruned from the log, (default is 1073741824, for 1GB)
 # * NUM_PARTITIONS: configure the default number of log partitions per topic
+# * AUTO_CREATE_TOPICS: allow kafka to auto create topics (default is true)
 
-# Get local internal docker ip
-MY_IP=`awk 'NR==1 {print $1}' /etc/hosts` 
 echo "### Starting Kafka..."
 
 # Set the kafka external host and port
-if [ ! -z "$KAFKA_HOST" ]; then
-    echo "### Kafka advertised host: $KAFKA_HOST"
+if [ ! -z "$SELF_HOST" ]; then
+    echo "### Kafka advertised host: $SELF_HOST"
     if grep -q "^advertised.host.name" $KAFKA_HOME/config/server.properties; then
-        sed -r -i "s/#(advertised.host.name)=(.*)/\1=$KAFKA_HOST/g" $KAFKA_HOME/config/server.properties
+        sed -r -i "s/#(advertised.host.name)=(.*)/\1=$SELF_HOST/g" $KAFKA_HOME/config/server.properties
     else
-        echo "advertised.host.name=$KAFKA_HOST" >> $KAFKA_HOME/config/server.properties
+        echo "advertised.host.name=$SELF_HOST" >> $KAFKA_HOME/config/server.properties
     fi
 fi
-if [ ! -z "$KAFKA_PORT" ]; then
-    echo "### Kafka advertised port: $KAFKA_PORT"
+if [ ! -z "$SELF_PORT" ]; then
+    echo "### Kafka advertised port: $SELF_PORT"
     if grep -q "^advertised.port" $KAFKA_HOME/config/server.properties; then
-        sed -r -i "s/#(advertised.port)=(.*)/\1=$KAFKA_PORT/g" $KAFKA_HOME/config/server.properties
+        sed -r -i "s/#(advertised.port)=(.*)/\1=$SELF_PORT/g" $KAFKA_HOME/config/server.properties
     else
-        echo "advertised.port=$KAFKA_PORT" >> $KAFKA_HOME/config/server.properties
+        echo "advertised.port=$SELF_PORT" >> $KAFKA_HOME/config/server.properties
     fi
 fi
 
