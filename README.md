@@ -29,5 +29,4 @@ kafka-topics --describe --zookeeper $ZOOKEEPER --topic test
 # Produce and consume events
 kafka-console-producer --broker-list $KAFKA --topic test
 kafka-console-consumer --bootstrap-server $KAFKA --topic test --from-beginning
-
 ```
