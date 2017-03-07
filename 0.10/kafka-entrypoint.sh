@@ -13,20 +13,12 @@
 echo "### Starting Kafka..."
 
 # Set the kafka external host and port
-if [ ! -z "$SELF_HOST" ]; then
-    echo "### Kafka advertised host: $SELF_HOST"
-    if grep -q "^advertised.host.name" $KAFKA_HOME/config/server.properties; then
-        sed -r -i "s/#(advertised.host.name)=(.*)/\1=$SELF_HOST/g" $KAFKA_HOME/config/server.properties
+if [ -n "$SELF_HOST" -a -n "$SELF_PORT" ]; then
+    echo "### Kafka advertised.listeners: PLAINTEXT://$SELF_HOST:$SELF_PORT"
+    if grep -q "^advertised.listeners" $KAFKA_HOME/config/server.properties; then
+        sed -r -i "s~#(advertised.listeners)=(.*)~\1=PLAINTEXT://$SELF_HOST:$SELF_PORT~g" $KAFKA_HOME/config/server.properties
     else
-        echo "advertised.host.name=$SELF_HOST" >> $KAFKA_HOME/config/server.properties
-    fi
-fi
-if [ ! -z "$SELF_PORT" ]; then
-    echo "### Kafka advertised port: $SELF_PORT"
-    if grep -q "^advertised.port" $KAFKA_HOME/config/server.properties; then
-        sed -r -i "s/#(advertised.port)=(.*)/\1=$SELF_PORT/g" $KAFKA_HOME/config/server.properties
-    else
-        echo "advertised.port=$SELF_PORT" >> $KAFKA_HOME/config/server.properties
+        echo "advertised.listeners=PLAINTEXT://$SELF_HOST:$SELF_PORT" >> $KAFKA_HOME/config/server.properties
     fi
 fi
 
