@@ -13,15 +13,22 @@ script:
   - HOST_PUB_IP=$(ifconfig | grep "eth0 " -A 1 | grep "inet " | cut -d':' -f2 | cut -d' ' -f1)
   - ZK_PORT_NODE=2181
   - KAFKA_PORT_NODE=9092
+  - KAFKA=$HOST_PUB_IP:$KAFKA_PORT_NODE
+  - ZOOKEEPER=$HOST_PUB_IP:$ZK_PORT_NODE/kafka
 
   #============================================================================
   # Test standalone Redis
   #============================================================================
   # Start standalone instance
-  - docker run -d -p $ZK_PORT_NODE:2181 -p $KAFKA_PORT_NODE:9092 -e ZK_CHROOT=kafka --name k0 docker-kafka
+  - docker run -d -p $ZK_PORT_NODE:2181 -p $KAFKA_PORT_NODE:9092 -e SELF_HOST=$HOST_PUB_IP -e SELF_PORT=$KAFKA_PORT_NODE -e ZK_CHROOT=kafka --name k0 docker-kafka
 
   # Wait for instance to be up (via Docker healthcheck)
   - for i in {30..0}; do HEALTH_CHECK=$(docker inspect --format='{{.State.Health.Status}}' k0 2>/dev/null); [ "$HEALTH_CHECK" == "running" ] && break; sleep 1; done
+
+  # Create an event in a topic
+  - kafka-topics.sh --create --zookeeper $ZOOKEEPER -replication-factor 1 --partitions 1 --topic events_topic
+  - echo "myevent" | kafka-console-producer.sh --broker-list $KAFKA --topic events_topic
+  - kafka-console-consumer.sh --bootstrap-server $KAFKA --topic test --from-beginning events_topic
 
   # Terminate redis
   - docker rm -f k0

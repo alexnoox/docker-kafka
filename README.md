@@ -7,7 +7,7 @@ Docker image for Apache Kafka
 `docker build -t docker-kafka ./0.10`
 
 * Run the master container
-`docker run -p 2181:2181 -p 9092:9092 --env ZK_CHROOT=kafka --env SELF_HOST=localhost --env SELF_PORT=9092 docker-kafka`
+`docker run -p 2181:2181 -p 9092:9092 --env ZK_CHROOT=kafka --env SELF_HOST=localhost --env SELF_PORT=9092 --name k0 docker-kafka`
 
 * Run a slave container (WIP)
 `docker run -p 2181:2181 -p 9092:9092 --env ZK_MASTER=ip:port/kafka --env SELF_HOST=localhost --env SELF_PORT=9092 docker-kafka`
