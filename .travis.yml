@@ -5,6 +5,12 @@ dist: trusty
 services:
   - docker
 
+before_install:
+  - SCALA_VERSION=2.11
+  - KAFKA_VERSION=0.10.1.0
+  - wget http://www.us.apache.org/dist/kafka/$KAFKA_VERSION/kafka_$SCALA_VERSION-$KAFKA_VERSION.tgz -O kafka.tgz
+  - mkdir -p kafka && tar xzf kafka.tgz -C kafka --strip-components 1
+
 script:
   # Build docker image
   - docker build -t docker-kafka ./0.10 > /dev/null 2>&1
@@ -26,9 +32,9 @@ script:
   - for i in {30..0}; do HEALTH_CHECK=$(docker inspect --format='{{.State.Health.Status}}' k0 2>/dev/null); [ "$HEALTH_CHECK" == "running" ] && break; sleep 1; done
 
   # Create an event in a topic
-  - kafka-topics.sh --create --zookeeper $ZOOKEEPER -replication-factor 1 --partitions 1 --topic events_topic
-  - echo "myevent" | kafka-console-producer.sh --broker-list $KAFKA --topic events_topic
-  - kafka-console-consumer.sh --bootstrap-server $KAFKA --topic test --from-beginning events_topic
+  - kafka/bin/kafka-topics.sh --create --zookeeper $ZOOKEEPER -replication-factor 1 --partitions 1 --topic eventstopic
+  - echo "myevent" | kafka/bin/kafka-console-producer.sh --broker-list $KAFKA --topic eventstopic
+  - kafka/bin/kafka-console-consumer.sh --bootstrap-server $KAFKA --topic test --from-beginning eventstopic
 
   # Terminate redis
   - docker rm -f k0
